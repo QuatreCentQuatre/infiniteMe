@@ -29,8 +29,7 @@
 
 	//--------Methods--------//
 	proto.__construct = function(options) {
-		this.provider = privateMethods.findProvider();
-		if (!this.provider || !Me.help) {
+		if (!Me.help) {
 			console.warn("infiniteMe :: required helpMe", "https://github.com/QuatreCentQuatre/helpMe");
 			return;
 		}
@@ -40,7 +39,7 @@
 			return;
 		}
 
-		this.options = this.provider.extend({}, this.defaults);
+		this.options = Me.help.extend({}, this.defaults);
 		this.setOptions(options);
 
 		if (!this.options.infinite_container) {
@@ -87,7 +86,7 @@
 	};
 
 	proto.setOptions = function(options) {
-		this.options = this.provider.extend(this.options, options);
+		this.options = Me.help.extend(this.options, options);
 	};
 
 	proto.addEvents = function() {
@@ -182,18 +181,6 @@
 	};
 
 	var privateMethods = {
-		findProvider: function(){
-			var provider = null;
-			if (!provider && window.Me && Me.help) {
-				provider = Me.help;
-			}
-
-			if (!provider && $) {
-				provider = $;
-			}
-
-			return provider;
-		}
 	};
 
 	if(!window.Me) {
