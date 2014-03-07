@@ -26,7 +26,7 @@
 		this.options = $.extend({}, this.options, options);
 	};
 
-	proto.addEventListener = function(type, callback, scope) {
+	proto.addEvent = function(type, callback, scope) {
 		var args      = arguments;
 		var finalArgs = [];
 
@@ -47,7 +47,7 @@
 		var totalListeners = this.listeners[type].length;
 		for (var i = 0; i < totalListeners; i++) {
 			var listener = this.listeners[type][i];
-			if (listener.scope == scope && listener.callback == callback && listener.args == args) {
+			if (listener.scope == scope && listener.callback == callback && listener.args.join(',') == args.join(',')) {
 				addListener = false;
 			}
 		}
@@ -64,7 +64,7 @@
 		return this;
 	};
 
-	proto.removeEventListener = function(type, callback, scope) {
+	proto.removeEvent = function(type, callback, scope) {
 		var args      = arguments;
 		var finalArgs = [];
 
@@ -82,7 +82,7 @@
 			var totalListeners = this.listeners[type].length;
 			for (var i = 0; i < totalListeners; i++) {
 				var listener = this.listeners[type][i];
-				if(listener.scope == scope && listener.callback == callback && listener.args == args) {
+				if(listener.scope == scope && listener.callback == callback && listener.args.join(',') == args.join(',')) {
 					removeListener = true;
 					this.listeners[type].splice(i, 1);
 					break;
@@ -99,7 +99,7 @@
 		return this;
 	};
 
-	proto.hasEventListener = function(type, callback, scope) {
+	proto.hasEvent = function(type, callback, scope) {
 		var existListener = false;
 		if(typeof this.listeners[type] != "undefined") {
 			var totalListeners = this.listeners[type].length;
@@ -114,7 +114,7 @@
 		return existListener;
 	};
 
-	proto.dispatch = function(type, target, params) {
+	proto.sendEvent = function(type, target, params) {
 		var newparams = [];
 		if (params) {
 			if (typeof params == "object" && typeof params.length == "undefined") {

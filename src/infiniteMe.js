@@ -72,7 +72,7 @@
 			}
 		}
 
-		Me.dispatch.addEventListener("infiniteMe.onload", this.pageLoaded, this);
+		Me.dispatch.addEvent("infiniteMe.onload", this.pageLoaded, this);
 
 		$(window).resize(Me.help.proxy(this.resizeHandler, this));
 		this.resizeHandler();
