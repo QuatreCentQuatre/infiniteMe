@@ -16,7 +16,7 @@
 		page_current: 1,
 		page_total: null,
 		toggler_enabled: true,
-		toggler_container: null,
+		toggler_button: null,
 		toggler_page_offset: 3,
 		infinite_offset: -100,
 		infinite_scope: proto,
@@ -50,11 +50,11 @@
 			return;
 		}
 
-		if (this.options.toggler_enabled && !this.options.toggler_container) {
-			console.warn("InfiniteMe :: need to set a 'toggler_container'");
+		if (this.options.toggler_enabled && !this.options.toggler_button) {
+			console.warn("InfiniteMe :: need to set a 'toggler_button'");
 			return;
-		} else if (this.options.toggler_enabled && !this.options.toggler_container.length > 0) {
-			console.warn("InfiniteMe :: need to set a valid 'toggler_container'");
+		} else if (this.options.toggler_enabled && !this.options.toggler_button.length > 0) {
+			console.warn("InfiniteMe :: need to set a valid 'toggler_button'");
 			return;
 		}
 
@@ -65,10 +65,10 @@
 		this.scrollOffset = null;
 
 		if (this.options.toggler_enabled) {
-			this.options.toggler_container.find('a').on('click', Me.help.proxy(this.togglerClickHandler, this));
+			this.options.toggler_button.on('click', Me.help.proxy(this.togglerClickHandler, this));
 			if (this.options.toggler_page_offset == -1) {
 				this.scrollLock = false;
-				this.options.toggler_container.css({display:'block'});
+				this.options.toggler_button.css({display:'block'});
 			}
 		}
 
@@ -127,7 +127,7 @@
 				this.scrollLock = false;
 			} else {
 				if (this.options.page_current < this.options.page_total) {
-					this.options.toggler_container.css({display:'block'});
+					this.options.toggler_button.css({display:'block'});
 				}
 			}
 		} else {
@@ -141,7 +141,7 @@
 		if(!this.loadLock && this.options.page_current < this.options.page_total){
 			this.options.page_current ++;
 			if (this.options.toggler_enabled) {
-				this.options.toggler_container.css({display:'none'});
+				this.options.toggler_button.css({display:'none'});
 			}
 			this.getPage();
 		}
