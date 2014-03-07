@@ -27,15 +27,21 @@
 		event_onload: null
 	};
 
+	var error = false;
+
 	//--------Methods--------//
 	proto.__construct = function(options) {
 		if (!Me.help) {
 			console.warn("infiniteMe :: required helpMe", "https://github.com/QuatreCentQuatre/helpMe");
-			return;
+			error = true;
 		}
 
 		if (!Me.dispatch) {
 			console.warn("infiniteMe :: required dispatchMe", "https://github.com/QuatreCentQuatre/dispatchMe");
+			error = true;
+		}
+
+		if (error) {
 			return;
 		}
 
