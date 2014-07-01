@@ -21,7 +21,7 @@
                     for(var i = 0; i < scope.options.item_per_page; i++) {
                         scope.$el.find('.item-list').append($('#item-t').html());
                     }
-                    Me.dispatch.dispatch('infiniteMe.onload');
+                    Me.dispatch.sendEvent('infiniteMe.onload');
                 }
             });
         });
