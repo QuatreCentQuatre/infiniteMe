@@ -45,7 +45,7 @@
             return;
         }
 
-        this.options = Me.help.extend({}, this.defaults);
+        this.options = $.extend({}, this.defaults);
         this.setOptions(options, true);
 
         if (!this.options.infinite_container) {
@@ -66,22 +66,22 @@
 
         this.$el = this.options.infinite_container;
         this.loadLock = false;
+        this.toogler_display = this.options.toggler_button.css('display');
 
+        Me.dispatch.subscribe("infiniteMe.onload", this.pageLoaded, this);
 
-        Me.dispatch.addEvent("infiniteMe.onload", this.pageLoaded, this);
-
-        $(window).resize(Me.help.proxy(this.resizeHandler, this));
+        $(window).resize($.proxy(this.resizeHandler, this));
 
         if (this.options.infinite_context == "scroll") {
-            this.$el.scroll(Me.help.proxy(this.scrollHandler, this));
+            this.$el.scroll($.proxy(this.scrollHandler, this));
         } else {
-            $(window).scroll(Me.help.proxy(this.scrollHandler, this));
+            $(window).scroll($.proxy(this.scrollHandler, this));
         }
         this.reset();
     };
 
     proto.setOptions = function(options, noReset) {
-        this.options = Me.help.extend(this.options, options);
+        this.options = $.extend(this.options, options);
         if(noReset){return;}
         this.reset();
     };
@@ -95,10 +95,10 @@
         this.scrollOffset = null;
 
         if (this.options.toggler_enabled) {
-            this.options.toggler_button.on('click', Me.help.proxy(this.togglerClickHandler, this));
+            this.options.toggler_button.on('click', $.proxy(this.togglerClickHandler, this));
             if (this.options.toggler_page_offset == -1) {
                 this.scrollLock = false;
-                this.options.toggler_button.css({display:'block'});
+                this.options.toggler_button.css({display: this.toogler_display});
             }
         }
         this.resizeHandler();
@@ -116,7 +116,7 @@
             this.options.infinite_loader.css({display:'block'});
         }
 
-        this.data = Me.help.extend({}, this.options.infinite_params, {page:this.options.page_current, max:this.options.page_total});
+        this.data = $.extend({}, this.options.infinite_params, {page:this.options.page_current, max:this.options.page_total});
 
         if (typeof this.options.event_onload == "function") {
             this.options.event_onload.call(this, this);
@@ -136,7 +136,7 @@
                 this.scrollLock = false;
             } else {
                 if (this.options.page_current < this.options.page_total) {
-                    this.options.toggler_button.css({display:'block'});
+                    this.options.toggler_button.css({display: this.toogler_display});
                 }
             }
         } else {
@@ -156,22 +156,24 @@
         }
     };
 
-    proto.resizeHandler = function(){
+    proto.resizeHandler = function() {
         if (this.options.infinite_context == "scroll") {
             this.scrollOffset = this.$el[0].scrollHeight - this.$el.outerHeight();
         } else if (this.options.infinite_context == "relative") {
-            this.scrollOffset = this.$el.offset().top + this.$el.outerHeight() - Me.help.getTotalH();
+            this.scrollOffset = this.$el.offset().top + this.$el.outerHeight() - Me.help.dimension.getTotalH();
         } else {
-            this.scrollOffset = $(document).height() - Me.help.getTotalH();
+            this.scrollOffset = $(document).height() - Me.help.dimension.getTotalH();
         }
+
+
     };
 
     proto.scrollHandler = function(){
         var scrollY;
         if (this.options.infinite_context == "scroll") {
-            scrollY = Me.help.getScrollOffsets(this.$el).y;
+            scrollY = Me.help.dimension.getScrollOffsets(this.$el).y;
         } else {
-            scrollY = Me.help.getScrollOffsets().y;
+            scrollY = Me.help.dimension.getScrollOffsets().y;
         }
 
         if (!this.loadLock && !this.scrollLock && scrollY > (this.scrollOffset + this.options.infinite_offset) && this.options.page_current < this.options.page_total) {
