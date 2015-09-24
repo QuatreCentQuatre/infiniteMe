@@ -67,8 +67,9 @@
         this.$el = this.options.infinite_container;
         this.loadLock = false;
         this.toogler_display = this.options.toggler_button.css('display');
+        this.options.toggler_button.css({display:'none'});
 
-        Me.dispatch.subscribe("infiniteMe.onload", this.pageLoaded, this);
+        Me.dispatch.addEvent("infiniteMe.onload", this.pageLoaded, this);
 
         $(window).resize($.proxy(this.resizeHandler, this));
 
@@ -96,7 +97,7 @@
 
         if (this.options.toggler_enabled) {
             this.options.toggler_button.on('click', $.proxy(this.togglerClickHandler, this));
-            if (this.options.toggler_page_offset == -1) {
+            if (this.options.toggler_page_offset == -1 && this.options.page_current < this.options.page_total) {
                 this.scrollLock = false;
                 this.options.toggler_button.css({display: this.toogler_display});
             }
