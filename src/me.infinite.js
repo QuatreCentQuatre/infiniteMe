@@ -1,16 +1,36 @@
-/*
- * infiniteMe
+/**
+ * InfiniteMe from the MeLibs
  * Library to enable infinite scrolling easily
- * */
-(function($, window, document, undefined){
-    var InfiniteMe = function(options){
-        this.__construct(options);
-    };
+ *
+ * Version :
+ *  - 1.0.2
+ *
+ * Dependencies :
+ *  - jQuery     (https://jquery.com/)
+ *  - HelpMe     (https://github.com/QuatreCentQuatre/helpMe)
+ *  - DispatchMe (https://github.com/QuatreCentQuatre/dispatchMe)
+ *
+ * Public Methods :
+ *  - setOptions
+ *  - getOptions
+ *  - reset
+ *  - getPage
+ *  - pageLoaded
+ *  - togglerClickHandler
+ *  - resizeHandler
+ *  - scrollHandler
+ *
+ * Private Methods :
+ *  -
+ */
 
-    var proto = InfiniteMe.prototype;
+(function($, window, document, undefined) {
+    "use strict";
 
-    proto.options  = null;
-    proto.defaults = {
+    /* Private Variables */
+    var instanceID      = 1;
+    var instanceName    = "InfiniteMe";
+    var defaults        = {
         debug: false,
         item_per_page: 9,
         page_current: 1,
@@ -19,97 +39,223 @@
         toggler_button: null,
         toggler_page_offset: 3,
         infinite_offset: -100,
-        infinite_scope: proto,
         infinite_params: {},
         infinite_context: null, // null, relative, scroll
         infinite_container: null,
-        infinite_loader: null, // element
+        infinite_loader: null,  // element
         event_onload: null
     };
+    var overwriteKeys   = [
+        'debug'
+    ];
 
-    var error = false;
+    /* Private Methods */
+    var privatesMethods = {};
 
-    //--------Methods--------//
+    /* Builder Method */
+    var InfiniteMe = function(options) {
+        this.__construct(options);
+    };
+
+    var proto = InfiniteMe.prototype;
+
+    /* Private Variables */
+    proto.__id          = null;
+    proto.__name        = null;
+    proto.__debugName   = null;
+
+    /* Publics Variables */
+    proto.debug         = null;
+    proto.options       = null;
+
+    /**
+     *
+     * __construct
+     * the first method that will be executed.
+     *
+     * @param   options     all the options that you need
+     * @return  object      null || scope
+     * @access  private
+     *
+     */
     proto.__construct = function(options) {
+        this.__id        = instanceID;
+        this.__name      = instanceName;
+        this.__debugName = this.__name + " :: ";
+
+        this.setOptions(options);
+
+        if (!this.__validateDependencies()) {return null;}
+        if (!this.__validateOptions()) {return null;}
+
+        instanceID ++;
+        this.__initialize();
+
+        return this;
+    };
+
+    /**
+     *
+     * __validateDependencies
+     * Will check if you got all the dependencies needed to use that plugins
+     *
+     * @return  boolean
+     * @access  private
+     *
+     */
+    proto.__validateDependencies = function() {
+        var isValid = true;
+
+        if (!window.jQuery) {
+            isValid = false;
+            if (this.debug) {console.warn(this.__debugName + "required jQuery (https://jquery.com/)");}
+        }
+
         if (!Me.help) {
-            console.warn("infiniteMe :: required helpMe", "https://github.com/QuatreCentQuatre/helpMe");
-            error = true;
+            isValid = false;
+            if (this.debug) {console.warn(this.__debugName + "required HelpMe (https://github.com/QuatreCentQuatre/helpMe)");}
         }
 
         if (!Me.dispatch) {
-            console.warn("infiniteMe :: required dispatchMe", "https://github.com/QuatreCentQuatre/dispatchMe");
-            error = true;
+            isValid = false;
+            if (this.debug) {console.warn(this.__debugName + "required DispatchMe (https://github.com/QuatreCentQuatre/dispatchMe)");}
         }
 
-        if (error) {
-            return;
-        }
+        return isValid;
+    };
 
-        this.options = $.extend({}, this.defaults);
-        this.setOptions(options, true);
+    /**
+     *
+     * __validateOptions
+     * Will check if you got all the required options needed to use that plugins
+     *
+     * @return  boolean
+     * @access  private
+     *
+     */
+    proto.__validateOptions = function() {
+        var isValid = true;
 
         if (!this.options.infinite_container) {
-            console.warn("InfiniteMe :: need to set a 'infinite_container'");
-            return;
+            isValid = false;
+            if (this.debug) {console.warn(this.__debugName + "need to set a 'infinite_container'");}
         } else if (!this.options.infinite_container.length > 0) {
-            console.warn("InfiniteMe :: need to set a valid 'infinite_container'");
-            return;
+            isValid = false;
+            if (this.debug) {console.warn(this.__debugName + "need to set a valid 'infinite_container'");}
         }
 
         if (this.options.toggler_enabled && !this.options.toggler_button) {
-            console.warn("InfiniteMe :: need to set a 'toggler_button'");
-            return;
+            isValid = false;
+            if (this.debug) {console.warn(this.__debugName + "need to set a 'toggler_button'");}
         } else if (this.options.toggler_enabled && !this.options.toggler_button.length > 0) {
-            console.warn("InfiniteMe :: need to set a valid 'toggler_button'");
-            return;
+            isValid = false;
+            if (this.debug) {console.warn(this.__debugName + "need to set a valid 'toggler_button'");}
         }
 
-        this.$el = this.options.infinite_container;
-        this.loadLock = false;
-        this.toogler_display = this.options.toggler_button.css('display');
-        this.options.toggler_button.css({display:'none'});
+        return isValid;
+    };
 
-        Me.dispatch.addEvent("infiniteMe.onload", this.pageLoaded, this);
+    /**
+     *
+     * __initialize
+     * set the basics
+     *
+     * @return  object scope
+     * @access  private
+     *
+     */
+    proto.__initialize = function() {
+        this.$el             = this.options.infinite_container;
+        this.loadLock        = false;
+
+        if(this.options.toggler_enabled) {
+            this.toggler_display = this.options.toggler_button.css('display');
+            this.options.toggler_button.css({display: 'none'});
+        }
+
+        Me.dispatch.subscribe("InfiniteMe.onload", this.pageLoaded, this);
 
         $(window).resize($.proxy(this.resizeHandler, this));
 
-        if (this.options.infinite_context == "scroll") {
-            this.$el.scroll($.proxy(this.scrollHandler, this));
-        } else {
-            $(window).scroll($.proxy(this.scrollHandler, this));
-        }
+        (this.options.infinite_context == "scroll") ? this.$el.scroll($.proxy(this.scrollHandler, this)) : $(window).scroll($.proxy(this.scrollHandler, this));
+
         this.reset();
+
+        return this;
     };
 
-    proto.setOptions = function(options, noReset) {
-        this.options = $.extend(this.options, options);
-        if(noReset){return;}
-        this.reset();
+    /**
+     *
+     * setOptions
+     * will merge options to the plugin defaultKeys and the rest will be set as additionnal options
+     *
+     * @param   options
+     * @return  object      scope
+     * @access  public
+     *
+     */
+    proto.setOptions = function(options) {
+        var scope    = this;
+        var settings = (this.options) ? $.extend({}, this.options, options) : $.extend({}, defaults, options);
+
+        $.each(settings, function(index, value) {
+            if ($.inArray(index, overwriteKeys) != -1) {
+                scope[index] = value;
+                delete settings[index];
+            }
+        });
+
+        this.options = settings;
+
+        return this;
     };
 
-    proto.addEvents = function() {
-
+    /**
+     *
+     * getOptions
+     * return the additional options that left
+     *
+     * @return  object options
+     * @access  public
+     *
+     */
+    proto.getOptions = function() {
+        return this.options;
     };
 
+    /**
+     *
+     * reset
+     *
+     * @access  public
+     *
+     */
     proto.reset = function() {
         this.scrollLock   = false;
         this.scrollOffset = null;
 
         if (this.options.toggler_enabled) {
             this.options.toggler_button.on('click', $.proxy(this.togglerClickHandler, this));
+
             if (this.options.toggler_page_offset == -1 && this.options.page_current < this.options.page_total) {
                 this.scrollLock = false;
-                this.options.toggler_button.css({display: this.toogler_display});
+                this.options.toggler_button.css({display: this.toggler_display});
             }
         }
+
         this.resizeHandler();
         this.scrollHandler();
     };
 
+    /**
+     *
+     * getPage
+     *
+     * @access  public
+     *
+     */
     proto.getPage = function() {
-        if (this.options.debug) {
-            console.info("InfiniteMe :: getPage : " + this.options.page_current);
-        }
+        if (this.debug) {console.info(this.__debugName + "getPage : " + this.options.page_current);}
 
         this.loadLock = true;
 
@@ -122,41 +268,68 @@
         if (typeof this.options.event_onload == "function") {
             this.options.event_onload.call(this, this);
         } else {
-            console.warn("infiniteMe :: need to set event_onload and dispatch 'infinite.onload'");
+            if (this.debug) {console.warn(this.__debugName + "need to set event_onload and dispatch 'InfiniteMe.onload'");}
         }
     };
 
+    /**
+     *
+     * pageLoaded
+     *
+     * @access  public
+     *
+     */
     proto.pageLoaded = function() {
         if (this.options.infinite_loader && this.options.infinite_loader.length > 0) {
             this.options.infinite_loader.css({display:'none'});
         }
 
         this.loadLock = false;
-        if(this.options.toggler_enabled) {
+
+        if (this.options.toggler_enabled) {
             if (this.options.page_current < this.options.toggler_page_offset) {
                 this.scrollLock = false;
             } else {
                 if (this.options.page_current < this.options.page_total) {
-                    this.options.toggler_button.css({display: this.toogler_display});
+                    this.options.toggler_button.css({display: this.toggler_display});
                 }
             }
         } else {
             this.scrollLock = false;
         }
+
         this.resizeHandler();
     };
 
+    /**
+     *
+     * togglerClickHandler
+     *
+     * @param   e           event
+     * @access  public
+     *
+     */
     proto.togglerClickHandler = function(e) {
         e.preventDefault();
-        if(!this.loadLock && this.options.page_current < this.options.page_total){
+
+        if (!this.loadLock && this.options.page_current < this.options.page_total) {
             this.options.page_current ++;
+
             if (this.options.toggler_enabled) {
                 this.options.toggler_button.css({display:'none'});
             }
+
             this.getPage();
         }
     };
 
+    /**
+     *
+     * resizeHandler
+     *
+     * @access  public
+     *
+     */
     proto.resizeHandler = function() {
         if (this.options.infinite_context == "scroll") {
             this.scrollOffset = this.$el[0].scrollHeight - this.$el.outerHeight();
@@ -165,38 +338,42 @@
         } else {
             this.scrollOffset = $(document).height() - Me.help.dimension.getTotalH();
         }
-
-
     };
 
+    /**
+     *
+     * scrollHandler
+     *
+     * @access  public
+     *
+     */
     proto.scrollHandler = function(){
-        var scrollY;
-        if (this.options.infinite_context == "scroll") {
-            scrollY = Me.help.dimension.getScrollOffsets(this.$el).y;
-        } else {
-            scrollY = Me.help.dimension.getScrollOffsets().y;
-        }
+        var scrollY = (this.options.infinite_context == "scroll") ? Me.help.dimension.getScrollOffsets(this.$el).y : Me.help.dimension.getScrollOffsets().y;
 
         if (!this.loadLock && !this.scrollLock && scrollY > (this.scrollOffset + this.options.infinite_offset) && this.options.page_current < this.options.page_total) {
             if (this.options.toggler_enabled) {
                 if (this.options.page_current < this.options.toggler_page_offset) {
                     this.options.page_current ++;
                     this.scrollLock = true;
+
                     this.getPage();
                 }
             } else {
                 this.options.page_current ++;
                 this.scrollLock = true;
+
                 this.getPage();
             }
         }
     };
 
-    var privateMethods = {
+    proto.toString = function() {
+        return "[" + this.__name + "]";
     };
 
-    if(!window.Me) {
-        window.Me = {};
-    }
+    /* Create Me reference if does'nt exist */
+    if (!window.Me) {window.Me = {};}
+
+    /*  */
     Me.infinite = InfiniteMe;
 }(jQuery, window, document));
