@@ -1,0 +1,9 @@
+body {margin:0; padding:0; width:100%; height:100%;}
+.header {line-height:200px; background-color:black;}
+.footer {line-height:200px; background-color:black;}
+#infinite {width:100%; background-color:green; overflow-y:scroll; height:300px;}
+#infinite .item {width:100%; height: 100px; background-color:#808080;}
+#infinite .item:nth-child(even) {background-color:aqua;}
+#infinite .item:nth-child(odd) {background-color:blue;}
+#infinite .loader {display:none; text-align:center;}
+#infinite .toggler {display:none; text-align:center;}
