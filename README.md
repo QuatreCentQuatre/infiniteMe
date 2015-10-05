@@ -73,7 +73,7 @@ var infinite = new Me.infinite($scope, {
 	toggler_button: $scope.find('.toggler'),
     toggler_page_offset: -1,
     event_onload: function(scope){
-    for(var i = 0; i < scope.options.item_per_page; i++) {
+        for(var i = 0; i < scope.options.item_per_page; i++) {
             scope.$el.find('.item-list').append($('#item-template').html());
         }
         Me.dispatch.sendEvent('infiniteMe.onload');
