@@ -3,10 +3,10 @@
  * Library to enable infinite scrolling easily
  *
  * Version :
- *  - 1.0.2
+ *  - 1.0.3
  *
  * Dependencies :
- *  - jQuery     (https://jquery.com/)
+ *  - jQuery     (http://jquery.com/download/)
  *  - HelpMe     (https://github.com/QuatreCentQuatre/helpMe)
  *  - DispatchMe (https://github.com/QuatreCentQuatre/dispatchMe)
  *
@@ -21,6 +21,9 @@
  *  - scrollHandler
  *
  * Private Methods :
+ *  -
+ *
+ * Updates Needed :
  *  -
  */
 
@@ -41,7 +44,6 @@
         infinite_offset: -100,
         infinite_params: {},
         infinite_context: null, // null, relative, scroll
-        infinite_container: null,
         infinite_loader: null,  // element
         event_onload: null
     };
@@ -53,8 +55,8 @@
     var privatesMethods = {};
 
     /* Builder Method */
-    var InfiniteMe = function(options) {
-        this.__construct(options);
+    var InfiniteMe = function($element, options) {
+        this.__construct($element, options);
     };
 
     var proto = InfiniteMe.prototype;
@@ -67,6 +69,7 @@
     /* Publics Variables */
     proto.debug         = null;
     proto.options       = null;
+    proto.$el           = null;
 
     /**
      *
@@ -78,15 +81,17 @@
      * @access  private
      *
      */
-    proto.__construct = function(options) {
+    proto.__construct = function($element, options) {
         this.__id        = instanceID;
         this.__name      = instanceName;
         this.__debugName = this.__name + " :: ";
 
+        this.$el         = $element;
+
         this.setOptions(options);
 
         if (!this.__validateDependencies()) {return null;}
-        if (!this.__validateOptions()) {return null;}
+        if (!this.__validateArguments()) {return null;}
 
         instanceID ++;
         this.__initialize();
@@ -108,7 +113,7 @@
 
         if (!window.jQuery) {
             isValid = false;
-            if (this.debug) {console.warn(this.__debugName + "required jQuery (https://jquery.com/)");}
+            if (this.debug) {console.warn(this.__debugName + "required jQuery (http://jquery.com/download/)");}
         }
 
         if (!Me.help) {
@@ -126,22 +131,19 @@
 
     /**
      *
-     * __validateOptions
+     * __validateArguments
      * Will check if you got all the required options needed to use that plugins
      *
      * @return  boolean
      * @access  private
      *
      */
-    proto.__validateOptions = function() {
+    proto.__validateArguments = function() {
         var isValid = true;
 
-        if (!this.options.infinite_container) {
+        if (!this.$el.length > 0) {
             isValid = false;
-            if (this.debug) {console.warn(this.__debugName + "need to set a 'infinite_container'");}
-        } else if (!this.options.infinite_container.length > 0) {
-            isValid = false;
-            if (this.debug) {console.warn(this.__debugName + "need to set a valid 'infinite_container'");}
+            if (this.debug) {console.warn(this.__debugName + "couldn't find associated element", this.$el);}
         }
 
         if (this.options.toggler_enabled && !this.options.toggler_button) {
@@ -150,6 +152,11 @@
         } else if (this.options.toggler_enabled && !this.options.toggler_button.length > 0) {
             isValid = false;
             if (this.debug) {console.warn(this.__debugName + "need to set a valid 'toggler_button'");}
+        }
+
+        if (typeof this.options.event_onload != "function") {
+            isValid = false;
+            if (this.debug) {console.warn(this.__debugName + "need to set event_onload and dispatch 'InfiniteMe.onload'");}
         }
 
         return isValid;
@@ -165,8 +172,7 @@
      *
      */
     proto.__initialize = function() {
-        this.$el             = this.options.infinite_container;
-        this.loadLock        = false;
+        this.loadLock = false;
 
         if(this.options.toggler_enabled) {
             this.toggler_display = this.options.toggler_button.css('display');
@@ -265,11 +271,7 @@
 
         this.data = $.extend({}, this.options.infinite_params, {page:this.options.page_current, max:this.options.page_total});
 
-        if (typeof this.options.event_onload == "function") {
-            this.options.event_onload.call(this, this);
-        } else {
-            if (this.debug) {console.warn(this.__debugName + "need to set event_onload and dispatch 'InfiniteMe.onload'");}
-        }
+        this.options.event_onload.call(this, this);
     };
 
     /**
