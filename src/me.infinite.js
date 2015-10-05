@@ -3,7 +3,7 @@
  * Library to enable infinite scrolling easily
  *
  * Version :
- *  - 1.0.3
+ *  - 1.1.0
  *
  * Dependencies :
  *  - jQuery     (http://jquery.com/download/)
