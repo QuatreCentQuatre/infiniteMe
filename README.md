@@ -14,9 +14,9 @@ Library to enable infinite scrolling easily
 
 **jQuery-1.9.1 ++** (http://jquery.com/download/)
 
-**HelpMe.js** (https://github.com/QuatreCentQuatre/helpMe)
+**HelpMe** (https://github.com/QuatreCentQuatre/helpMe)
 
-**DispatchMe.js** (https://github.com/QuatreCentQuatre/dispatchMe)
+**DispatchMe** (https://github.com/QuatreCentQuatre/dispatchMe)
 
 ---
 
