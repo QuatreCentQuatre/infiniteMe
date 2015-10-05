@@ -1,6 +1,12 @@
-#infiniteMe
+#InfiniteMe
 
 Library to enable infinite scrolling easily
+
+---
+
+### Version
+
+**1.1.0**
 
 ---
 
@@ -8,23 +14,24 @@ Library to enable infinite scrolling easily
 
 **jQuery-1.9.1 ++** (http://jquery.com/download/)
 
-**helpMe.js** (https://github.com/QuatreCentQuatre/helpMe)
+**HelpMe.js** (https://github.com/QuatreCentQuatre/helpMe)
 
-**dispatchMe.js** (https://github.com/QuatreCentQuatre/dispatchMe)
+**DispatchMe.js** (https://github.com/QuatreCentQuatre/dispatchMe)
 
 ---
 
 ### Getting Started
 
-Place the **spriteMe.js** file in your default JavaScript vendor directory. Link the script before the end of your **body** and after **jquery.js**.
+Place the **me.infinite.js** file in your default JavaScript vendor directory. Link the script before the end of your **body** and after **jquery.js**.
 
 ```
 <script src="js/vendor/jquery-1.9.1.min.js"></script>
-<script src="js/vendor/helpMe.js"></script>
-<script src="js/vendor/dispatchMe.js"></script>
-<script src="js/vendor/infiniteMe.js"></script>
+<script src="js/vendor/me.help.js"></script>
+<script src="js/vendor/me.help.dimension.js"></script>
+<script src="js/vendor/me.dispatch.js"></script>
+<script src="js/vendor/me.infinite.js"></script>
 ```
-Here you go ! You're now ready to use infiniteMe. Here the basics !
+Here you go ! You're now ready to use InfiniteMe. Here the basics !
 
 **Don't forgot to check the demos for more informations!**
 
@@ -50,7 +57,6 @@ Here you go ! You're now ready to use infiniteMe. Here the basics !
 
 ```
 //Parameters
-//-infinite_container: Container
 //-infinite_offset: Number of pixels needed to be at based on the container (Ex:-5, 5 pixel before the end of the container)
 //-infinite_loader: Loading Message or Icon (Showed before adding new items)
 //-item_per_page: Number of items per page
@@ -59,8 +65,7 @@ Here you go ! You're now ready to use infiniteMe. Here the basics !
 //-toggler_page_offset: When the button appear by default it's after the 3rd page (toggler_page_offset: 3, -1 being infinite)
 
 var $scope = $('#infinite');
-var infinite = new Me.infinite({
-    infinite_container: $scope,
+var infinite = new Me.infinite($scope, {
     infinite_offset: -5,
     infinite_loader: $scope.find('.loader'),
     item_per_page: 4,
