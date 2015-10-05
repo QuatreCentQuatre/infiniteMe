@@ -1,6 +1,6 @@
 $(document).ready(function() {
-    var $scope = $('#infinite');
-    var infinite = new Me.infinite($scope, {
+    var $scope      = $('#infinite');
+    var infinite    = new Me.infinite($scope, {
         debug: true,
         infinite_loader: $scope.find('.loader'),
         item_per_page: 4,
