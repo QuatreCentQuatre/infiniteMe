@@ -1,8 +1,7 @@
 $(document).ready(function() {
     var $scope = $('#infinite');
-    var infinite = new Me.infinite({
+    var infinite = new Me.infinite($scope, {
         debug: true,
-        infinite_container: $scope,
         infinite_offset: -5,
         infinite_loader: $scope.find('.loader'),
         item_per_page: 4,
